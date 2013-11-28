@@ -8,7 +8,7 @@
  "manifest": {
   "send-to-dune/main": {
    "docsSHA256": null, 
-   "jsSHA256": "170dc15d9913298a2031c32a6bf416243c2e35a5f7b0e0fd2b4e1a5b140b3af8",                
+   "jsSHA256": "ef6babf43e56ddefb985a6e13106264b37ecb3ce661375b43582bbe1d91bb731",                
    "moduleName": "main", 
    "packageName": "send-to-dune", 
    "requirements": {
@@ -42,7 +42,7 @@
    "description": "Sends YouTube and Other, video and music links to DUNE for playback", 
    "main": "main", 
    "name": "send-to-dune", 
-   "version": "1.0.0.8",
+   "version": "1.0.0.9",
    "permissions":  {"private-browsing": true}
   }
  }, 

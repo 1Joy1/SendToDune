@@ -11,25 +11,25 @@ function getYoutuParams(html) {
             var urls = innerHTML.match(/"url_encoded_fmt_stream_map": "([^"]*)"/)[1];
             urls = urls.split(",");
             var videoParams = new Array();
-			var s =false;
+      var s =false;
             for (var i in urls) {
                 urls[i] = unescape(urls[i]);
                 var params = urls[i].split("\\u0026");
                 for (var j in params) {
-                    if (params[j].indexOf(URL) != -1)     	{ var url = params[j].split(URL)[1]; }
-                    if (params[j].indexOf(QUALITY) != -1) 	{ var quality = params[j].split(QUALITY)[1]; }
+                    if (params[j].indexOf(URL) != -1)       { var url = params[j].split(URL)[1]; }
+                    if (params[j].indexOf(QUALITY) != -1)   { var quality = params[j].split(QUALITY)[1]; }
                     if (params[j].indexOf(FALLBACK_HOST) != -1) { var fallbackHost = params[j].split(FALLBACK_HOST)[1]; }
-                    if (params[j].indexOf(TYPE) != -1) 		{ var fileType = params[j].split(TYPE)[1]; }
-                    if (params[j].indexOf(ITAG) != -1) 		{ var itag = parseInt(params[j].split(ITAG)[1]); }
-                    if (params[j].indexOf(SIG) != -1) 		{ var sig = params[j].split(SIG)[1]; }
+                    if (params[j].indexOf(TYPE) != -1)    { var fileType = params[j].split(TYPE)[1]; }
+                    if (params[j].indexOf(ITAG) != -1)    { var itag = parseInt(params[j].split(ITAG)[1]); }
+                    if (params[j].indexOf(SIG) != -1)     { var sig = params[j].split(SIG)[1]; }
                     if (params[j].indexOf(S) != -1 && params[j].substring(0,2) == S) {s = params[j].split(S)[1]; }
                 }
                 if (sig && url.indexOf("signature") == -1) { url += "&signature=" + sig; }
 
                     videoParams.push({
-                        url 		: url, 		                        // "\u0026" is an "&"
-                        quality 	        : quality,	                        // example, "large", "medium"
-                        fallbackHost 	: fallbackHost,	                        // example, "tc.v22.cache4.c.youtube.com"
+                        url     : url,                            // "\u0026" is an "&"
+                        quality           : quality,                          // example, "large", "medium"
+                        fallbackHost  : fallbackHost,                         // example, "tc.v22.cache4.c.youtube.com"
                         id                  : i,
                         itag : itag,
                         s : s
@@ -93,13 +93,13 @@ function parseUrl(url,pathname){
     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
     var match = url.match(regExp);
     if (match&&match[2].length==11){
-		YouTubeSendToDUNE(url);
+    YouTubeSendToDUNE(url);
         return;
     }
     var regExp2 = /^.*(youtube.com\/watch.*[\?\&]v=)([^#\&\?]*).*/;
     var match = url.match(regExp2);
     if (match&&match[2].length==11){
-		YouTubeSendToDUNE(url);
+    YouTubeSendToDUNE(url);
         return;
     }
     var ext = pathname.split('.').pop();
@@ -108,9 +108,9 @@ function parseUrl(url,pathname){
 }
 function YouTubeSendToDUNE(link){
         Request({
-    	  url: link,
-		  onComplete: function (resp) {
-		    var videos = getYoutuParams(resp.text);
+        url: link,
+      onComplete: function (resp) {
+        var videos = getYoutuParams(resp.text);
             var url="";
             var ytresolution;
 
@@ -126,11 +126,11 @@ function YouTubeSendToDUNE(link){
                  if(video.itag == ytresolution){
 
                     needVideo = video; }});
-			 if (!needVideo){videos.forEach(function (video){
+       if (!needVideo){videos.forEach(function (video){
                      if(video.itag == 22){
 
                      needVideo = video;  }     }  );}
-			 if (!needVideo){videos.forEach(function (video){
+       if (!needVideo){videos.forEach(function (video){
                      if(video.itag == 18){
 
                      needVideo = video; }     }  );}
@@ -143,15 +143,15 @@ function YouTubeSendToDUNE(link){
                 url = url.replace(/&/g,"%26");
 
                 if(needVideo.s){
-                     // Instead of "any the site" must be a real address server for decipher sig
+                    // Instead of "any the site" must be a real address server for decipher sig
                     var forDecodeUrl = "http://any the site/echo?message=" + needVideo.s;
                     Request({
                         url: forDecodeUrl,
-    	                onComplete: function (resp) {
-						if (resp.status == 200) {
+                      onComplete: function (resp) {
+            if (resp.status == 200) {
                             url += "%26signature="+resp.text;
                             sendToDUNE(url);
-						} else { displayMessage('Error','Server decrypt signature return ERROR '+ resp.status +': '+ resp.statusText,'error');}
+            } else { displayMessage('Error','Server decrypt signature return ERROR '+ resp.status +': '+ resp.statusText,'error');}
                         }
                     }).get();
                 }
@@ -159,7 +159,7 @@ function YouTubeSendToDUNE(link){
                     sendToDUNE(url);
                 }
             }
-		  }}).get();
+      }}).get();
 
 }
 function sendToDUNE(fileurl){
@@ -171,44 +171,44 @@ function sendToDUNE(fileurl){
         displayMessage('Error','You have to set up your DUNE address first in the Addon Settings','error');
         return false;
     }var pictReg=/\.(?:jp(?:e?g|e|2)|gif|png|tiff?|bmp|ico)$/i;
-	if (pictReg.test (fileurl))
-	{var link='http://'+prefs.duneip+'/cgi-bin/do?cmd=start_file_playback&media_url='+fileurl;  // Protocol "1"
-	} else {
-	var link='http://'+prefs.duneip+'/cgi-bin/do?cmd=start_playlist_playback&media_url='+fileurl;  // Protocol "3" starting with firmware v.120531_2200_beta
-	        }
-    displayMessage('Sending','Sending url to DUNE... '+link,'info');
+  if (pictReg.test (fileurl))
+  {var link='http://'+prefs.duneip+'/cgi-bin/do?cmd=start_file_playback&media_url='+fileurl;  // Protocol "1"
+  } else {
+  var link='http://'+prefs.duneip+'/cgi-bin/do?cmd=start_playlist_playback&media_url='+fileurl;  // Protocol "3" starting with firmware v.120531_2200_beta
+          }
+    displayMessage('Sending','Sending url to DUNE... ','info');
 
-	 Request({
-		  url: link,
-		  onComplete: function (resp) {
-			if(resp.text.indexOf('<param name="command_status" value="ok"/>')>-1){
-				    var    re = /<param name="playback_state" value="((\w)*)"/i;;
-					var match = resp.text.match(re);
-					if (match != null) {
-						var result = match[1];
-						}
-				displayMessage('Success Sent to DUNE',' DUNE reported: PLAYBACK_STATE '+result,'ok');
-			}
+   Request({
+      url: link,
+      onComplete: function (resp) {
+      if(resp.text.indexOf('<param name="command_status" value="ok"/>')>-1){
+            var    re = /<param name="playback_state" value="((\w)*)"/i;;
+          var match = resp.text.match(re);
+          if (match != null) {
+            var result = match[1];
+            }
+        displayMessage('Success Sent to DUNE',' DUNE reported: PLAYBACK_STATE '+result,'ok');
+      }
             if(resp.text.indexOf('<param name="command_status" value="timeout"/>')>-1){
-    			    var    re = /<param name="playback_state" value="((\w)*)"/i;;
-					var match = resp.text.match(re);
-					if (match != null) {
-						var result = match[1];
-						}
-				displayMessage('Success Sent to DUNE',' DUNE reported: PLAYBACK_STATE '+result,'ok');
-			}
+              var    re = /<param name="playback_state" value="((\w)*)"/i;;
+          var match = resp.text.match(re);
+          if (match != null) {
+            var result = match[1];
+            }
+        displayMessage('Success Sent to DUNE',' DUNE reported: PLAYBACK_STATE '+result,'ok');
+      }
             if(resp.text.indexOf('<param name="command_status" value="failed"/>')>-1){
-    			    var    re = /<param name="error_description" value="((((\w)*)((\s)*))*)"/i;
-					var match = resp.text.match(re);
-					if (match != null) {
-						var result = match[1];
-						}
-				displayMessage('Failed Sent to DUNE','DUNE reported: ERROR_DESCRIPTION '+result,'error');
-			}
+              var    re = /<param name="error_description" value="((((\w)*)((\s)*))*)"/i;
+          var match = resp.text.match(re);
+          if (match != null) {
+            var result = match[1];
+            }
+        displayMessage('Failed Sent to DUNE','DUNE reported: ERROR_DESCRIPTION '+result,'error');
+      }
 
              if(resp.text == ""){
                 displayMessage('Network error','Could not contact DUNE. Check your configuration.','error');
                 return;
             }
-		}}).get();
+    }}).get();
 }
