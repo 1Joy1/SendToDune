@@ -3,7 +3,7 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. --><RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>send-to-dune@jetpack</em:id>
-    <em:version>1.0.0.9</em:version>
+    <em:version>1.0.1.2</em:version>
     <em:type>2</em:type>
     <em:bootstrap>true</em:bootstrap>
     <em:unpack>false</em:unpack>
@@ -13,7 +13,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>19.0</em:minVersion>
-        <em:maxVersion>25.*</em:maxVersion>
+        <em:maxVersion>36.*</em:maxVersion>
       </Description>
     </em:targetApplication>
 
@@ -21,8 +21,8 @@
     <em:name>Send to DUNE</em:name>
     <em:description>Sends YouTube and Other, video and music links to DUNE for playback</em:description>
     <em:creator>MarshakDeveloper and !Joy!</em:creator>
-	   
+
     <em:optionsType>2</em:optionsType>
-    
+
   </Description>
 </RDF>

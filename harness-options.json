@@ -1,70 +1,70 @@
 {
- "enable_e10s": false, 
- "is-sdk-bundled": true, 
- "jetpackID": "send-to-dune@jetpack", 
- "loader": "addon-sdk/lib/sdk/loader/cuddlefish.js", 
- "main": "main", 
- "mainPath": "send-to-dune/main", 
+ "enable_e10s": false,
+ "is-sdk-bundled": true,
+ "jetpackID": "send-to-dune@jetpack",
+ "loader": "addon-sdk/lib/sdk/loader/cuddlefish.js",
+ "main": "main",
+ "mainPath": "send-to-dune/main",
  "manifest": {
   "send-to-dune/main": {
-   "docsSHA256": null, 
-   "jsSHA256": "ef6babf43e56ddefb985a6e13106264b37ecb3ce661375b43582bbe1d91bb731",                
-   "moduleName": "main", 
-   "packageName": "send-to-dune", 
+   "docsSHA256": null,
+   "jsSHA256": "4f69acf25e6b815fb2a0ce4574e153af52d9f45227e520b86c49328c7b78d912",
+   "moduleName": "main",
+   "packageName": "send-to-dune",
    "requirements": {
-    "sdk/context-menu": "sdk/context-menu", 
-    "sdk/page-mod": "sdk/page-mod", 
-    "sdk/panel": "sdk/panel", 
-    "sdk/request": "sdk/request", 
-    "sdk/self": "sdk/self", 
+    "sdk/context-menu": "sdk/context-menu",
+    "sdk/page-mod": "sdk/page-mod",
+    "sdk/panel": "sdk/panel",
+    "sdk/request": "sdk/request",
+    "sdk/self": "sdk/self",
     "sdk/simple-prefs": "sdk/simple-prefs"
-   }, 
+   },
    "sectionName": "lib"
   }
- }, 
+ },
  "metadata": {
   "addon-sdk": {
-   "description": "Add-on development made easy.", 
+   "description": "Add-on development made easy.",
    "keywords": [
-    "javascript", 
-    "engine", 
-    "addon", 
-    "extension", 
-    "xulrunner", 
-    "firefox", 
+    "javascript",
+    "engine",
+    "addon",
+    "extension",
+    "xulrunner",
+    "firefox",
     "browser"
-   ], 
-   "license": "MPL 2.0", 
+   ],
+   "license": "MPL 2.0",
    "name": "addon-sdk"
-  }, 
+  },
   "send-to-dune": {
-   "author": "MarshakDeveloper and !Joy!", 
-   "description": "Sends YouTube and Other, video and music links to DUNE for playback", 
-   "main": "main", 
-   "name": "send-to-dune", 
-   "version": "1.0.0.9",
+   "author": "MarshakDeveloper and !Joy!",
+   "description": "Sends YouTube and Other, video and music links to DUNE for playback",
+   "main": "main",
+   "name": "send-to-dune",
+   "version": "1.0.1.2",
    "permissions":  {"private-browsing": true}
   }
- }, 
- "name": "send-to-dune", 
+ },
+ "name": "send-to-dune",
  "preferences": [
   {
-   "description": "The IPv4 address of the device DUNE-HD runs on", 
-   "name": "duneip", 
-   "title": "DUNE IP", 
-   "type": "string", 
+   "description": "The IPv4 address of the device DUNE-HD runs on",
+   "name": "duneip",
+   "title": "DUNE IP",
+   "type": "string",
    "value": ""
-  }, 
+  },
   {
-   "description": "Select the playback quality for youtube 360p or 720p or 1080p", 
-   "name": "ytresolution", 
-   "title": "YOUTUBE RESOLUTION PLAYBACK", 
-   "type": "string", 
+   "description": "Select the playback quality for youtube 360p or 720p or 1080p",
+   "name": "ytresolution",
+   "title": "YOUTUBE RESOLUTION PLAYBACK",
+   "type": "string",
    "value": "360p"
   }
- ], 
- "repack": "true", 
- "sdkVersion": "1.14", 
- "staticArgs": {}, 
+ ],
+ "repack": "true",
+ "sdkVersion": "1.17",
+ "staticArgs": {},
  "verbose": false
 }
