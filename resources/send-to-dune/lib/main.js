@@ -1,20 +1,47 @@
+/*
+Copyright (c) 2014 MarshakDeveloper and !Joy!
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+//Includes
+var Request = require("sdk/request").Request;
+var prefs = require("sdk/simple-prefs").prefs;
+var data = require("sdk/self").data;
+var pageMod = require("sdk/page-mod");
+var _ = require("sdk/l10n").get;
+var cm = require("sdk/context-menu");
+var addonUri = require("sdk/self").uri;
+var tabs = require("sdk/tabs");
+var store = require("sdk/simple-storage");
+var panel;
+var manager;
+var topmenu;
+var separator;
+var duneIPplay;
+var DeviceLabel;
+
 function getYoutuParams(html) {
-            var URL = "url=";
-            var QUALITY = "quality=";
-            var FALLBACK_HOST = "fallback_host=";
-            var TYPE = "type=";
-            var ITAG = "itag=";
-            var SIG = "sig=";
-            var S = "s=";
+    var URL = "url=";
+    var QUALITY = "quality=";
+    var FALLBACK_HOST = "fallback_host=";
+    var TYPE = "type=";
+    var ITAG = "itag=";
+    var SIG = "sig=";
+    var S = "s=";
 
             try { var innerHTML = html; } catch(ex) { return false; }  // in case document is not fully loaded ---
-            var urls = innerHTML.match(/"url_encoded_fmt_stream_map":"([^"]*)"/)[1];
-            urls = urls.split(",");
+          //  var urls = innerHTML.match(/"url_encoded_fmt_stream_map":"([^"]*)"/)[1];
+      var urls = innerHTML.match(/url_encoded_fmt_stream_map=([^&]*)&/)[1];
+            urls = urls.split("%2C");
+         //   urls = urls.split(",");
             var videoParams = new Array();
       var s =false;
             for (var i in urls) {
                 urls[i] = unescape(urls[i]);
-                var params = urls[i].split("\\u0026");
+               // var params = urls[i].split("\\u0026");
+                var params = urls[i].split("&");
                 for (var j in params) {
                     if (params[j].indexOf(URL) != -1)       { var url = params[j].split(URL)[1]; }
                     if (params[j].indexOf(QUALITY) != -1)   { var quality = params[j].split(QUALITY)[1]; }
@@ -35,17 +62,134 @@ function getYoutuParams(html) {
                         s : s
                     });
             }
-            return videoParams;
-        }
-var Request = require("sdk/request").Request;
-var prefs = require("sdk/simple-prefs").prefs;
-var data = require("sdk/self").data;
-var pageMod = require("sdk/page-mod");
-var panel;
-
-exports.main = function() {
-    var cm = require("sdk/context-menu");
-    cm.Item({
+            return videoParams
+}
+//Update? Just see if we can find the deprecated config entries//Update if
+function checkUpdate() {
+  if (!store.storage.servers || store.storage.servers.length === 0) {
+    store.storage.servers = [];
+    var duneipfull = require('sdk/preferences/service')
+                       .get(['extensions', require('sdk/self').id, 'duneip'].join('.'));
+  if (typeof duneipfull !== "undefined" && duneipfull !== '') {
+    duneipfull = duneipfull.split(":");
+  var duneip = duneipfull[0];
+  var duneport = duneipfull[1];
+      if (typeof duneport === "undefined" || duneport === '') duneport = "80";
+      //Previous version detected
+      var defaultserver = {
+        label: 'Default',
+        host: duneip,
+        port: duneport
+      };
+      //Store new default server
+      store.storage.servers.push(defaultserver);
+    }
+  }
+}
+//Launch configuration manager
+function launchConfigTab() {
+   for (let tab of tabs){
+       if (tab.url === "resource://send-to-dune-at-jetpack/send-to-dune/data/preferences.html") {
+         tab.activate();
+       return;
+      }
+    }
+  tabs.open({
+    url: data.url('preferences.html')
+  });
+}
+//Save the servers
+function saveServers(servers) {
+  store.storage.servers = [];
+  servers.forEach(function (server) {
+    store.storage.servers.push({
+      label: server.label,
+      host: server.host,
+      port: server.port
+    });
+  });
+  refreshMenus();
+}
+//Sends the current options in the settings page
+function getCurrServ(worker) {
+     worker.port.emit('init', {
+        servers: getServers(),
+    YTresolution: prefs.ytresolution,
+    textbtnDEL: _("Delete"),
+    textbtnEDIT: _("Edit")
+      });
+}
+//Refresh context menus with new servers
+function refreshMenus() {
+  //Remove all old items from the menu
+if (topmenu.items){
+  topmenu.items.forEach(function (it) {
+    it.destroy();
+  });
+  }
+ topmenu.destroy();
+  if (store.storage.servers.length > 1){
+ setUpTopMenu(initSubMenus());
+  }else {
+        SingleContextMenu();
+    }
+ }
+//Set up the top context menu with submenus
+function setUpTopMenu(mitems) {
+  topmenu = cm.Menu({
+    label: "Send to DUNE",
+    context: cm.SelectorContext('a[href*="rutube.ru/video"]:not([href*="person"]),a[href*="youtu"],a[href^="/watch"],a[href^="/get"],a[href*=".mp4"],a[href*=".mkv"],a[href*=".avi"],a[href*=".flv"],a[href*=".wmv"],a[href*=".asf"],a[href*=".mp3"],a[href*=".flac"],a[href*=".mka"],a[href*=".mov"],a[href*=".m4a"],a[href*=".aac"],a[href*=".ogg"],a[href*=".pls"],a[href*=".jpg"],a[href*=".png"],a[href*=".gif"],a[href*=".jpeg"],a[href*=".tiff"],a[href*=".mpg"],a[href*=".m3u"]'),
+    image: data.url('dune_logo.ico'),
+  contentScript: 'self.on("click", function (node, data) {' +
+      ' self.postMessage({url:node.href,pathname:node.pathname,server:data});' +
+      '});',
+    items: mitems[0],
+  onMessage: function (data) {
+    if(data.server != undefined){
+        var servANDlable = data.server.split('separator_string');
+    duneIPplay = servANDlable[0];
+    DeviceLabel = servANDlable[1];
+    parseUrl(data.url,data.pathname);
+    }
+    }
+  });
+  separator = cm.Separator();
+  topmenu.addItem(separator);
+  manager = cm.Item({
+    label: _("Manage Send to DUNE"),
+    contentScript: 'self.on("click", self.postMessage)',
+    onMessage: launchConfigTab
+  });
+  topmenu.addItem(manager);
+}
+//Create submenus
+function initSubMenus() {
+  //Parse all servers
+  var servers = getServers();
+  var items = [];
+  servers.forEach(function (server) {
+    var it = cm.Item({
+      label: server.label,
+    data: server.host + ':' + server.port + 'separator_string' + server.label
+    });
+    items.push(it);
+  });
+  return [items];
+}
+//Get all servers from the config
+function getServers() {
+  if (!store.storage.servers)
+    store.storage.servers = [];
+  return store.storage.servers;
+}
+// Create sigle context menu
+function SingleContextMenu(){
+var servers = getServers();
+if (servers[0] !== undefined){
+     duneIPplay = servers[0].host + ':' + servers[0].port;
+   DeviceLabel = "";
+     }else { duneIPplay = ""; }
+topmenu = cm.Item({
       label: "Send to DUNE",
       context: cm.SelectorContext('a[href*="rutube.ru/video"]:not([href*="person"]),a[href*="youtu"],a[href^="/watch"],a[href^="/get"],a[href*=".mp4"],a[href*=".mkv"],a[href*=".avi"],a[href*=".flv"],a[href*=".wmv"],a[href*=".asf"],a[href*=".mp3"],a[href*=".flac"],a[href*=".mka"],a[href*=".mov"],a[href*=".m4a"],a[href*=".aac"],a[href*=".ogg"],a[href*=".pls"],a[href*=".jpg"],a[href*=".png"],a[href*=".gif"],a[href*=".jpeg"],a[href*=".tiff"],a[href*=".mpg"],a[href*=".m3u"]'),
       image: data.url('dune_logo.ico'),
@@ -53,35 +197,78 @@ exports.main = function() {
                  ' self.postMessage({url:node.href,pathname:node.pathname});' +
                  '});',
       onMessage: function(data) {
-         parseUrl(data.url,data.pathname);
+       parseUrl(data.url,data.pathname);
        }
     });
+  }
+
+exports.onUnload = function (reason) {
+ if (reason === "disable"){
+   for (let tab of tabs){
+       if (tab.url === "resource://send-to-dune-at-jetpack/send-to-dune/data/preferences.html") {
+         tab.close();
+       return;
+      }
+    }
+  }
+}
+
+exports.main = function() {
+checkUpdate();
+if (store.storage.servers.length > 1){
+    setUpTopMenu(initSubMenus());
+}else SingleContextMenu();
+
     pageMod.PageMod({
       include: "*.youtube.com",
       contentScriptFile: data.url("youtube.js"),
+    attachTo: ["existing", "top"],
       onAttach: function(worker) {
-        worker.port.emit('injectSendButton',data.url('dune.png'));
-        worker.port.on("openurl", function(url) {
-            //parseUrl(url,'');
-            YouTubeSearchLink(url);
+        worker.port.emit('injectSendButton', {
+    image: data.url('dune.png'),
+    servers: getServers()
+    });
+        worker.port.on("openurl", function(data) {
+            duneIPplay = data.server; DeviceLabel = data.label;
+            YouTubeSearchLink(data.url);
         });
       }
     });
     pageMod.PageMod({
       include: "*.rutube.ru",
       contentScriptFile: data.url("rutube.js"),
+    attachTo: ["existing", "top"],
       onAttach: function(worker) {
-        worker.port.emit('injectSendButton',data.url('dune_rutoo5.png'));
-        worker.port.on("openurl", function(url) {
-            RuTubeSearchLink(url);
+        worker.port.emit('injectSendButton',{
+    image: data.url('dune_rutoo5.png'),
+    servers: getServers()
+    });
+        worker.port.on("openurl", function(data) {
+        duneIPplay = data.server; DeviceLabel = data.label;
+            RuTubeSearchLink(data.url);
         });
       }
     });
+    pageMod.PageMod({
+    include: data.url('preferences.html'),
+    contentScriptFile: [data.url("jquery-2.1.1.min.js"), data.url('preferences.js')],
+    onAttach: function(worker) {
+      worker.port.on("updateservers", function (servers, YoutubeResolutios) {
+        //Update the server configuration
+    prefs.ytresolution = YoutubeResolutios;
+        saveServers(servers);
+      });
+      //Now sends the current options in the settings page
+      getCurrServ(worker);
+    }
+  })
 };
-function displayMessage(title,message,type){
-    if(panel){
+function displayMessage(title,message,message2,type){
+    var futer = _("If you enjoy this add-on, you can support its continued development by making a small contribution.");
+    if(message2 !== '') {message2 = '"' + message2 + '"';}
+  if(panel){
         panel.show();
-        panel.port.emit("showtext",{'title':title,'message':message,'type':type});
+        panel.port.emit("showtext",{'title':title,'message':message,'devicelabel':message2,'futer':futer,'type':type});
     }else{
         panel = require("sdk/panel").Panel({
           width: 300,
@@ -93,7 +280,7 @@ function displayMessage(title,message,type){
             panel = null;
           },
           onShow: function(){
-              panel.port.emit("showtext",{'title':title,'message':message,'type':type});
+              panel.port.emit("showtext",{'title':title,'message':message,'devicelabel':message2,'futer':futer,'type':type});
           }
         }).show();
     }
@@ -121,10 +308,19 @@ function parseUrl(url,pathname){
         sendToDUNE(url);
         return;
 }
+function extractVideoID(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if ( match && match[7].length == 11 ){
+        return match[7];
+    }
+}
 function YouTubeSearchLink(link){
+    var videoId = extractVideoID(link);
+    link = 'http://www.youtube.com/get_video_info?&video_id=' + videoId + '&asv=3&el=detailpage&hl=en_US';
     Request({
         url: link,
-      headers: {"User-Agent": "None"},       // "User-Agent": "None" for youtube server, that he thought that I do not know what is SSL
+    //  headers: {"User-Agent": "None"},       // "User-Agent": "None" for youtube server, that he thought that I do not know what is SSL
       onComplete: function (resp) {
         var videos = getYoutuParams(resp.text);
             var url="";
@@ -149,7 +345,7 @@ function YouTubeSearchLink(link){
 
             url = needVideo.url;
              if (url == ""){
-                displayMessage('Error','No suported formats: ','error');
+                displayMessage(_("Error"),_("No supported formats: "),'','error');
                 }
             else {
                 url = url.replace(/&/g,"%26");
@@ -162,7 +358,7 @@ function YouTubeSearchLink(link){
             if (resp.status == 200) {
                             url += "%26signature="+resp.text;
                             sendToDUNE(url);
-                      } else { displayMessage('Error','Server decrypt signature return ERROR '+ resp.status +': '+ resp.statusText,'error');}
+                      } else { displayMessage(_("Error"),_("Server decrypt signature return ERROR ") + resp.status +': '+ resp.statusText,'','error');}
               }
                     }).get();
                 }
@@ -183,7 +379,7 @@ var link = "http://rutube.ru/api/play/options/" + rutubeVideoID + "/?format=json
 }
 function getRutubeParams(html){
 try { var innerHTML = html; } catch(ex) { return false; }  // in case document is not fully loaded ---
-if (innerHTML.search(/\"m3u8\"\: \"([^\"]*)\"/) == -1) {displayMessage('Error','This video can not be sent to Dune. Most likely, the copyright holder of this video, banned the show in your region.','error'); return;}
+if (innerHTML.search(/\"m3u8\"\: \"([^\"]*)\"/) == -1) {displayMessage(_("Error"),_("This video can not be sent to Dune. Most likely, the copyright holder of this video, banned the show in your region."),'','error'); return;}
 var urls = innerHTML.match(/\"m3u8\"\: \"([^\"]*)\"/)[1];
        Request({
         url: urls,
@@ -197,19 +393,23 @@ var urls = innerHTML.match(/\"m3u8\"\: \"([^\"]*)\"/)[1];
             }).get();
 }
 function sendToDUNE(fileurl){
+ //console.log("fileurl=   "+fileurl+"    =fileurl");
    fileurl = fileurl.replace(/&/g,"%26");
    fileurl = fileurl.replace("file:///","smb:");
+   fileurl = fileurl.replace("https","http");    // Для контакта с доподнительными плагинами.
 
-   if(!prefs.duneip || prefs.duneip == ''){
-        displayMessage('Error','You have to set up your DUNE address first in the Addon Settings','error');
+   if(duneIPplay == ''){
+        displayMessage(_("Error"),_("You have to set up your DUNE address first in the Addon Settings"),'','error');
         return false;
-    }var pictReg=/\.(?:jp(?:e?g|e|2)|gif|png|tiff?|bmp|ico)$/i;
+    }
+  var pictReg=/\.(?:jp(?:e?g|e|2)|gif|png|tiff?|bmp|ico)$/i;
   if (pictReg.test (fileurl))
-  {var link='http://'+prefs.duneip+'/cgi-bin/do?cmd=start_file_playback&media_url='+fileurl;  // Protocol "1"
+  {var link='http://'+duneIPplay+'/cgi-bin/do?cmd=start_file_playback&media_url='+fileurl;  // Protocol "1"
   } else {
-  var link='http://'+prefs.duneip+'/cgi-bin/do?cmd=start_playlist_playback&media_url='+fileurl;  // Protocol "3" starting with firmware v.120531_2200_beta
+  var link='http://'+duneIPplay+'/cgi-bin/do?cmd=start_playlist_playback&media_url='+fileurl;  // Protocol "3" starting with firmware v.120531_2200_beta
           }
-    displayMessage('Sending','Sending url to DUNE... ','info');
+    displayMessage(_("Sending"),_("Sending url to DUNE... "),DeviceLabel,'info');
+ //console.log("link=   "+link);
    Request({
       url: link,
       onComplete: function (resp) {
@@ -219,7 +419,7 @@ function sendToDUNE(fileurl){
           if (match != null) {
             var result = match[1];
             }
-        displayMessage('Success Sent to DUNE',' DUNE reported: PLAYBACK_STATE '+result,'ok');
+        displayMessage(_("Success Sent to DUNE"),_(" DUNE reported: PLAYBACK_STATE ") +result,'','ok');
       }
             if(resp.text.indexOf('<param name="command_status" value="timeout"/>')>-1){
               var    re = /<param name="playback_state" value="((\w)*)"/i;;
@@ -227,7 +427,7 @@ function sendToDUNE(fileurl){
           if (match != null) {
             var result = match[1];
             }
-        displayMessage('Success Sent to DUNE',' DUNE reported: PLAYBACK_STATE '+result,'ok');
+        displayMessage(_("Success Sent to DUNE"),_(" DUNE reported: PLAYBACK_STATE ") +result,'','ok');
       }
             if(resp.text.indexOf('<param name="command_status" value="failed"/>')>-1){
               var    re = /<param name="error_description" value="((((\w)*)((\s)*))*)"/i;
@@ -235,11 +435,11 @@ function sendToDUNE(fileurl){
           if (match != null) {
             var result = match[1];
             }
-        displayMessage('Failed Sent to DUNE','DUNE reported: ERROR_DESCRIPTION '+result,'error');
+        displayMessage(_("Failed Sent to DUNE"),_("DUNE reported: ERROR_DESCRIPTION ") +result,'','error');
       }
 
              if(resp.text == ""){
-                displayMessage('Network error','Could not contact DUNE. Check your configuration.','error');
+                displayMessage(_("Network error"),_("Could not contact DUNE. Check your configuration."),'','error');
                 return;
             }
     }}).get();

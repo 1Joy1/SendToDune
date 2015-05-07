@@ -1,6 +1,8 @@
 {
+ "abort_on_missing": false,
+ "check_memory": false,
  "enable_e10s": false,
- "is-sdk-bundled": true,
+ "is-sdk-bundled": false,
  "jetpackID": "send-to-dune@jetpack",
  "loader": "addon-sdk/lib/sdk/loader/cuddlefish.js",
  "main": "main",
@@ -8,16 +10,20 @@
  "manifest": {
   "send-to-dune/main": {
    "docsSHA256": null,
-   "jsSHA256": "4f69acf25e6b815fb2a0ce4574e153af52d9f45227e520b86c49328c7b78d912",
+   "jsSHA256": "77b1630ecb88bb37e273cb557d0a6839d978d69a0f86ec8cc1869c127cc25719",
    "moduleName": "main",
    "packageName": "send-to-dune",
    "requirements": {
     "sdk/context-menu": "sdk/context-menu",
     "sdk/page-mod": "sdk/page-mod",
     "sdk/panel": "sdk/panel",
+  "sdk/preferences/service": "sdk/preferences/service",
     "sdk/request": "sdk/request",
     "sdk/self": "sdk/self",
-    "sdk/simple-prefs": "sdk/simple-prefs"
+    "sdk/simple-prefs": "sdk/simple-prefs",
+  "sdk/simple-storage": "sdk/simple-storage",
+    "sdk/tabs": "sdk/tabs",
+  "sdk/l10n": "sdk/l10n"
    },
    "sectionName": "lib"
   }
@@ -39,30 +45,16 @@
   },
   "send-to-dune": {
    "author": "MarshakDeveloper and !Joy!",
-   "description": "Sends YouTube and Other, video and music links to DUNE for playback",
+   "description": "Sends YouTube, RuTube and Other, video and music links to DUNE for playback",
    "main": "main",
    "name": "send-to-dune",
-   "version": "1.0.1.2",
+   "version": "1.0.1.5",
    "permissions":  {"private-browsing": true}
   }
  },
  "name": "send-to-dune",
- "preferences": [
-  {
-   "description": "The IPv4 address of the device DUNE-HD runs on",
-   "name": "duneip",
-   "title": "DUNE IP",
-   "type": "string",
-   "value": ""
-  },
-  {
-   "description": "Select the playback quality for youtube 360p or 720p or 1080p",
-   "name": "ytresolution",
-   "title": "YOUTUBE RESOLUTION PLAYBACK",
-   "type": "string",
-   "value": "360p"
-  }
- ],
+ "parseable": false,
+ "preferencesBranch": "send-to-dune@jetpack",
  "repack": "true",
  "sdkVersion": "1.17",
  "staticArgs": {},
