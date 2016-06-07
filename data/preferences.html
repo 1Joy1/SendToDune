@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Send to DUNE preferences</title>
+    <!-- Bootstrap -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap.theme.min.css" rel="stylesheet">
+    <link href="preferences.css" rel="stylesheet">
+  </head>
+  <div class="navbar-fixed-top">
+    <div class="container">
+      <h1><strong><span style="vertical-align: sub">Send to DUNE <small>preferences</small></span></strong></h1>
+
+      </div> <div class="page-header"></div> </div>
+      <body role="document" background="PrefBackGraund.png">
+        <div class="container theme-showcase" role="main">
+          <h2 data-l10n-id="Your media players DUNE-HD">Your media players DUNE-HD</h2>
+          <p data-l10n-id="No media players DUNE-HD defined" id="noservers" class="alert alert-info hidden">No media players DUNE-HD defined, you can add your first one below</p>
+          <table class="table table-striped">
+            <thead>
+              <tr><th data-l10n-id="DUNE-HD Name">DUNE-HD Name</th><th>DUNE-HD IP</th><th>DUNE-HD port</th><th data-l10n-id="Edit/Remove">Edit/Remove</th></tr>
+            </thead>
+            <tbody id="serverlist">
+            </tbody>
+          </table>
+          <div id="formmode" class="addmode">
+            <h3 data-l10n-id="Add your DUNE-HD player" class="adding">Add your DUNE-HD player</h3>
+            <h3 data-l10n-id="Edit your DUNE-HD player" class="editing">Edit your DUNE-HD player</h3>
+            <form id="addserver" class="form-inline" role="form">
+              <div class="form-group">
+                <input type="text" name="server-label" required data-toggle="tooltip" data-placement="top" class="form-control" id="server-label" placeholder="DUNE-HD name" data-title="The name you want for this DUNE-HD player" />
+              </div>
+              <div class="form-group">
+                <input type="text" name="server-ip" required data-toggle="tooltip" data-placement="top" class="form-control" id="server-ip" placeholder="DUNE-HD IP" data-title="The IP address of the device DUNE-HD" />
+              </div>
+              <div class="form-group">
+                <input type="text" name="server-port" data-toggle="tooltip" data-placement="top" class="form-control" id="server-port" placeholder="DUNE-HD Port" data-title="The port DUNE-HD is listening on (default: 80)" />
+              </div>
+
+              <div class="form-group">
+                <button type="button" class="btn btn-info adding" id="server-add" data-l10n-id="Add">Add</button>
+                <button type="button" class="btn btn-info editing" id="server-edit" data-l10n-id="Edit">Edit</button>
+              </div>
+            </form>
+          </div>
+          <br /><br />
+          <div id="optionsYoutubeResolution">
+            <h2 data-l10n-id="Youtube resolution playback">Youtube resolution playback</h2>
+            <label class="radio-inline">
+              <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="360p"> 360p (low quality)
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="720p"> 720p HD
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="1080p"> 1080p HD (unsupported now)
+            </label>
+            <h6 data-l10n-id="Select the playback quality for">Select the playback quality for youtube 360p or 720p or 1080p</h6>
+            <h6 data-l10n-id="At this moment, youtube">At this moment, youtube does not give a stream 1080p in one container (video + audio), but the add-on will automatically select the highest possible quality.</h6>
+          </div>
+        </div>
+        <script src="jquery-2.1.1.min.js"></script>
+        <script src="tooltips.js"></script>
+
+
+        <script>
+        $(document).ready(function(){
+        if (navigator.language.search(/ru/) != -1 || $('#server-edit').html() == "Изменить" || $('#server-add').html() == "Добавить"){
+        $("[name=server-label]:eq(0)").attr("data-title","Произвольное имя, например \"Гостиная\"");
+        $("[name=server-ip]:eq(0)").attr("data-title","IP адрес вашей приставки DUNE-HD");
+        $("[name=server-port]:eq(0)").attr("data-title","Порт DUNE-HD. Оставьте это поле пустым, если не меняли порт приставки.");
+        }});
+        </script>
+      </body>
+    </html>

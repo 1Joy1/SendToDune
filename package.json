@@ -1,0 +1,20 @@
+{
+  "title": "Send to DUNE",
+  "name": "send-to-dune",
+  "id": "send-to-dune@jetpack",
+  "version": "1.0.2",
+  "description": "Sends YouTube, RuTube and Other, video and music links to DUNE for playback",
+  "main": "lib/main.js",
+  "author": "MarshakDeveloper and !Joy!",
+  "permissions":  {
+    "private-browsing": true
+  },
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MPL 2.0",
+  "keywords": [
+    "jetpack"
+  ]
+}
